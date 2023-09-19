@@ -8,7 +8,11 @@ const App = () => {
   }
   const handleSubmit = (e) => {
     e.preventDefault()
-    setPersons(persons.concat({ name: newName }))
+    const person = { name: newName }
+    if (persons.find((p) => p.name === person.name))
+      alert(`${person.name} is already registered`)
+    else setPersons(persons.concat({ name: newName }))
+    setNewName('')
   }
   return (
     <div>
