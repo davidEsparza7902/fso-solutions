@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+
 const Filter = ({ filter, handler }) => {
   return (
     <div>
@@ -7,6 +8,7 @@ const Filter = ({ filter, handler }) => {
     </div>
   )
 }
+
 const Form = ({
   handleChangeName,
   newName,
@@ -43,6 +45,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,32 +57,33 @@ const App = () => {
     }
     fetchData()
   }, [])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const person = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    }
+    if (persons.find((p) => p.name === person.name))
+      alert(`${person.name} is already registered`)
+    else {
+      personService.addPerson(person)
+      setPersons(persons.concat(person))
+    }
+    setNewName('')
+    setNewNumber('')
+  }
   const handleChangeFilter = (e) => {
     setFilter(e.target.value)
   }
   const handleChangeName = (e) => {
     setNewName(e.target.value)
   }
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const person = { name: newName }
-    if (persons.find((p) => p.name === person.name))
-      alert(`${person.name} is already registered`)
-    else {
-      setPersons(
-        persons.concat({
-          name: newName,
-          number: newNumber,
-          id: persons.length + 1,
-        })
-      )
-    }
-    setNewName('')
-    setNewNumber('')
-  }
   const handleChangeNumber = (e) => {
     setNewNumber(e.target.value)
   }
+
   const personsToShow = persons.filter((person) => {
     const f = filter.toUpperCase()
     return person.name.toUpperCase().startsWith(f)

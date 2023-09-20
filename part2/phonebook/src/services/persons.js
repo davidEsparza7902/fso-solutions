@@ -8,6 +8,10 @@ const getAll = async () => {
     throw e
   }
 }
+const addPerson = (person) => {
+  axios.post(baseURL, person)
+}
 export default {
   getAll,
+  addPerson,
 }
