@@ -72,15 +72,25 @@ const App = () => {
     const res = confirm(`Seguro de eliminar a ${person.name}??`)
     if (res) {
       setPersons(persons.filter((p) => p.id !== person.id))
-      personService.deletePerson(person)
+      personService.deletePerson(id)
     }
   }
   const handleSubmit = (e) => {
     e.preventDefault()
     const person = { name: newName, number: newNumber, id: generateId() }
-    if (persons.find((p) => p.name === person.name))
-      alert(`${person.name} is already registered`)
-    else {
+    const i = persons.findIndex((p) => p.name === person.name)
+    console.log(i)
+    if (i !== -1) {
+      const conf = confirm(
+        `${person.name} is already added to phonebook, replace the old number with a new one`
+      )
+      if (conf) {
+        personService.editPerson(persons[i].id, person)
+        const newPersons = [...persons]
+        newPersons[i] = person
+        setPersons(newPersons)
+      }
+    } else {
       personService.addPerson(person)
       setPersons(persons.concat(person))
     }
