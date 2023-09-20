@@ -11,7 +11,15 @@ const getAll = async () => {
 const addPerson = (person) => {
   axios.post(baseURL, person)
 }
+const deletePerson = async (person) => {
+  try {
+    const res = await axios.delete(`${baseURL}/${person.id}`)
+  } catch (error) {
+    throw error
+  }
+}
 export default {
   getAll,
   addPerson,
+  deletePerson,
 }

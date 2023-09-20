@@ -32,12 +32,19 @@ const Form = ({
     </form>
   )
 }
-
-const People = ({ persons }) =>
+const Person = ({ person, handleDelete }) => {
+  return (
+    <div style={{ display: 'flex', gap: '20px', padding: '10px' }}>
+      <p>
+        {person.id} || {person.name} - {person.number}
+      </p>
+      <button onClick={() => handleDelete(person)}>Eliminar {person.id}</button>
+    </div>
+  )
+}
+const People = ({ persons, handleDelete }) =>
   persons.map((person) => (
-    <p key={person.id}>
-      {person.id} || {person.name} - {person.number}
-    </p>
+    <Person key={person.id} person={person} handleDelete={handleDelete} />
   ))
 
 const App = () => {
@@ -57,14 +64,20 @@ const App = () => {
     }
     fetchData()
   }, [])
-
+  const generateId = () => {
+    const maxId = Math.max(...persons.map((person) => person.id))
+    return maxId + 1
+  }
+  const handleDelete = (person) => {
+    const res = confirm(`Seguro de eliminar a ${person.name}??`)
+    if (res) {
+      setPersons(persons.filter((p) => p.id !== person.id))
+      personService.deletePerson(person)
+    }
+  }
   const handleSubmit = (e) => {
     e.preventDefault()
-    const person = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    }
+    const person = { name: newName, number: newNumber, id: generateId() }
     if (persons.find((p) => p.name === person.name))
       alert(`${person.name} is already registered`)
     else {
@@ -102,7 +115,7 @@ const App = () => {
         handleSubmit={handleSubmit}
       />
       <h3>Numbers</h3>
-      <People persons={personsToShow} />
+      <People persons={personsToShow} handleDelete={handleDelete} />
     </div>
   )
 }
