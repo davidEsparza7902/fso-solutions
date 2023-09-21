@@ -12,6 +12,9 @@ const Notification = ({ message, messageType }) => {
     submit: {
       style: { color: 'green', border: '5px green solid' },
     },
+    error: {
+      style: { color: 'red', border: '5px red solid' },
+    },
   }
   if (!message) return null
   return (
@@ -91,18 +94,27 @@ const App = () => {
   }, [])
 
   const generateId = () => {
+    if (persons.length === 0) return 1
     const maxId = Math.max(...persons.map((person) => person.id))
     return maxId + 1
   }
 
-  const handleDelete = (person) => {
+  const handleDelete = async (person) => {
     const res = confirm(`Seguro de eliminar a ${person.name}??`)
     if (res) {
-      setPersons(persons.filter((p) => p.id !== person.id))
-      personService.deletePerson(person.id)
-      setMessage(`${person.name}'s information deleted in the phonebook`)
-      setMessageType('delete')
-      deleteMessage()
+      try {
+        await personService.deletePerson(person.id)
+        setPersons(persons.filter((p) => p.id !== person.id))
+        setMessage(`${person.name}'s information deleted in the phonebook`)
+        setMessageType('delete')
+        deleteMessage()
+      } catch (error) {
+        setMessage(
+          `${person.name}'s information already deleted from the server`
+        )
+        setMessageType('error')
+        deleteMessage()
+      }
     }
   }
 

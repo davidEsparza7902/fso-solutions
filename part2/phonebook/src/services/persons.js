@@ -17,6 +17,7 @@ const editPerson = (id, person) => {
 const deletePerson = async (id) => {
   try {
     const res = await axios.delete(`${baseURL}/${id}`)
+    return res.data
   } catch (error) {
     throw error
   }
