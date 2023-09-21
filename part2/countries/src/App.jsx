@@ -8,32 +8,42 @@ const SearchBar = ({ value, onChange }) => {
     </nav>
   )
 }
+const Country = ({ country }) => {
+  const languages = Object.values(country.languages)
+  return (
+    <>
+      <h2>{country.name.common}</h2>
+      <p>Capital {country.capital}</p>
+      <p>Area {country.area}</p>
+      <h3>Languages</h3>
+      <ul>
+        {languages.map((language) => (
+          <li key={language}>{language}</li>
+        ))}
+      </ul>
+      <img src={country.flags['png']} alt="" />
+    </>
+  )
+}
 const Content = ({ countries }) => {
+  const [show, setShow] = useState({})
+  const toggleShow = (countryName) => {
+    setShow({ ...show, [countryName]: !show[countryName] })
+  }
   if (countries.length > 10)
     return <p>Too many matches, specify another filter</p>
-  else if (countries.length > 1)
-    return countries.map((country) => {
-      return <p key={country.name.common}>{country.name.common}</p>
-    })
-  if (countries.length === 1) {
-    const c = countries[0]
-    const languages = Object.values(c.languages)
-
-    return (
-      <>
-        <h2>{c.name.common}</h2>
-        <p>Capital {c.capital}</p>
-        <p>Area {c.area}</p>
-        <h3>Languages</h3>
-        <ul>
-          {languages.map((language) => (
-            <li key={language}>{language}</li>
-          ))}
-        </ul>
-        <img src={c.flags['png']} alt="" />
-      </>
-    )
+  else if (countries.length > 1) {
+    return countries.map((country) => (
+      <div key={country.name.common}>
+        <p>{country.name.common}</p>
+        <button onClick={() => toggleShow(country.name.common)}>
+          {show[country.name.common] ? 'Hide' : 'Show'}
+        </button>
+        {show[country.name.common] ? <Country country={country} /> : null}
+      </div>
+    ))
   }
+  if (countries.length === 1) return <Country country={countries[0]} />
 
   return null
 }
