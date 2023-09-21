@@ -1,6 +1,25 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+const Notification = ({ message, messageType }) => {
+  const messageTypeMap = {
+    delete: {
+      style: { color: 'red', border: '5px red solid' },
+    },
+    update: {
+      style: { color: 'yellow', border: '5px yellow solid' },
+    },
+    submit: {
+      style: { color: 'green', border: '5px green solid' },
+    },
+  }
+  if (!message) return null
+  return (
+    <div style={messageTypeMap[messageType]['style']}>
+      <h2>{message}</h2>
+    </div>
+  )
+}
 const Filter = ({ filter, handler }) => {
   return (
     <div>
@@ -8,7 +27,6 @@ const Filter = ({ filter, handler }) => {
     </div>
   )
 }
-
 const Form = ({
   handleChangeName,
   newName,
@@ -46,13 +64,20 @@ const People = ({ persons, handleDelete }) =>
   persons.map((person) => (
     <Person key={person.id} person={person} handleDelete={handleDelete} />
   ))
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('')
 
+  const deleteMessage = () => {
+    setTimeout(() => {
+      setMessage(null)
+      setMessageType(null)
+    }, 3000)
+  }
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,22 +89,27 @@ const App = () => {
     }
     fetchData()
   }, [])
+
   const generateId = () => {
     const maxId = Math.max(...persons.map((person) => person.id))
     return maxId + 1
   }
+
   const handleDelete = (person) => {
     const res = confirm(`Seguro de eliminar a ${person.name}??`)
     if (res) {
       setPersons(persons.filter((p) => p.id !== person.id))
-      personService.deletePerson(id)
+      personService.deletePerson(person.id)
+      setMessage(`${person.name}'s information deleted in the phonebook`)
+      setMessageType('delete')
+      deleteMessage()
     }
   }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const person = { name: newName, number: newNumber, id: generateId() }
     const i = persons.findIndex((p) => p.name === person.name)
-    console.log(i)
     if (i !== -1) {
       const conf = confirm(
         `${person.name} is already added to phonebook, replace the old number with a new one`
@@ -89,10 +119,16 @@ const App = () => {
         const newPersons = [...persons]
         newPersons[i] = person
         setPersons(newPersons)
+        setMessage(`${person.name}'s number updated in the phonebook`)
+        setMessageType('update')
+        deleteMessage()
       }
     } else {
       personService.addPerson(person)
       setPersons(persons.concat(person))
+      setMessage(`${person.name} added to the Phonebook`)
+      setMessageType('submit')
+      deleteMessage()
     }
     setNewName('')
     setNewNumber('')
@@ -114,6 +150,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} messageType={messageType} />
       <Filter handler={handleChangeFilter} filter={filter} />
 
       <h3>Add a new</h3>
