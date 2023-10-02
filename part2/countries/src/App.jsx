@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import countriesService from './services/countries'
+// props validation  
+
 const SearchBar = ({ value, onChange }) => {
   return (
     <nav>

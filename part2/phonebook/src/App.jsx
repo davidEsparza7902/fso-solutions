@@ -1,72 +1,10 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import Filter from './components/filter'
+import Notification from './components/notification'
+import Form from './components/form'
+import People from './components/people'
 
-const Notification = ({ message, messageType }) => {
-  const messageTypeMap = {
-    delete: {
-      style: { color: 'red', border: '5px red solid' },
-    },
-    update: {
-      style: { color: 'yellow', border: '5px yellow solid' },
-    },
-    submit: {
-      style: { color: 'green', border: '5px green solid' },
-    },
-    error: {
-      style: { color: 'red', border: '5px red solid' },
-    },
-  }
-  if (!message) return null
-  return (
-    <div style={messageTypeMap[messageType]['style']}>
-      <h2>{message}</h2>
-    </div>
-  )
-}
-const Filter = ({ filter, handler }) => {
-  return (
-    <div>
-      Filter: <input value={filter} onChange={handler} />
-    </div>
-  )
-}
-const Form = ({
-  handleChangeName,
-  newName,
-  handleChangeNumber,
-  newNumber,
-  handleSubmit,
-}) => {
-  return (
-    <form>
-      <div>
-        name: <input onChange={handleChangeName} value={newName} />
-      </div>
-      <div>
-        number: <input onChange={handleChangeNumber} value={newNumber} />
-      </div>
-      <div>
-        <button type="submit" onClick={handleSubmit}>
-          add
-        </button>
-      </div>
-    </form>
-  )
-}
-const Person = ({ person, handleDelete }) => {
-  return (
-    <div style={{ display: 'flex', gap: '20px', padding: '10px' }}>
-      <p>
-        {person.id} || {person.name} - {person.number}
-      </p>
-      <button onClick={() => handleDelete(person)}>Eliminar {person.id}</button>
-    </div>
-  )
-}
-const People = ({ persons, handleDelete }) =>
-  persons.map((person) => (
-    <Person key={person.id} person={person} handleDelete={handleDelete} />
-  ))
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -83,12 +21,8 @@ const App = () => {
   }
   useEffect(() => {
     const fetchData = async () => {
-      try {
         const data = await personService.getAll()
         setPersons(data)
-      } catch (error) {
-        throw error
-      }
     }
     fetchData()
   }, [])
